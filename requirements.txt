@@ -1,5 +1,5 @@
 streamlit
 google-genai
-pdf2image
+pymupdf
 pillow
 python-dotenv
