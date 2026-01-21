@@ -1,22 +1,32 @@
 import io
 from PIL import Image
-from pdf2image import convert_from_bytes
+import pymupdf
 import streamlit as st
 from typing import List
 
 def convert_pdf_to_images(pdf_bytes: bytes, dpi: int = 300) -> List[Image.Image]:
     """
-    Convert PDF bytes to a list of PIL Images.
-    
+    Convert PDF bytes to a list of PIL Images using PyMuPDF.
+
     Args:
         pdf_bytes: PDF file content as bytes
         dpi: Resolution for conversion (higher = better quality but slower)
-    
+
     Returns:
         List of PIL Image objects, one per page
     """
     try:
-        images = convert_from_bytes(pdf_bytes, dpi=dpi)
+        images = []
+        doc = pymupdf.open(stream=pdf_bytes, filetype="pdf")
+        zoom = dpi / 72  # PyMuPDF default is 72 DPI
+        mat = pymupdf.Matrix(zoom, zoom)
+
+        for page in doc:
+            pix = page.get_pixmap(matrix=mat)
+            img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+            images.append(img)
+
+        doc.close()
         return images
     except Exception as e:
         st.error(f"Error converting PDF to images: {str(e)}")
