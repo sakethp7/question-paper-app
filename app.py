@@ -24,7 +24,7 @@ st.set_page_config(
 # Initialize Gemini client
 @st.cache_resource
 def get_gemini_client():
-    api_key = os.getenv("GEMINI_API_KEY")
+    api_key = st.secrets["GEMINI_API_KEY"]
     if not api_key:
         st.error("Please set GEMINI_API_KEY in your .env file")
         st.stop()
